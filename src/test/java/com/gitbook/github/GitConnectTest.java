@@ -5,7 +5,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 class GitConnectTest {
@@ -18,8 +20,11 @@ class GitConnectTest {
         //given
         String login = "KrzysztofDolanski";
         //when
-        User user = gitConnect.getUser(login);
+        List<User> users = gitConnect.getUsers(login);
         //then
-        assertTrue(user.name().equals(login));
+        assertAll(
+                () -> assertNotNull(users),
+                () -> assertEquals(users.get(0).login(), login)
+        );
     }
 }

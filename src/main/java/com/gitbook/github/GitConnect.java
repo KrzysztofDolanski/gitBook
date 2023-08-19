@@ -1,19 +1,20 @@
 package com.gitbook.github;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.gitbook.request.RequestInfoService;
 import com.gitbook.user.User;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatusCode;
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.HttpServerErrorException;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.reactive.function.client.ClientResponse;
-import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.UnknownHttpStatusCodeException;
 import reactor.core.publisher.Mono;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Stream;
 
 @Component
 public class GitConnect {
@@ -24,30 +25,33 @@ public class GitConnect {
     @Value("${github.users}")
     private String USERS;
 
-    public User getUser(String login) {
-        List<User> gitUser = getUserData(login);
-        ObjectMapper mapper = new ObjectMapper();
-//        return mapDataToUser(gitUser, mapper).findFirst().orElseThrow(UserNotFoundException::new);
-        return gitUser.get(0);
+    private static final Logger logger = LoggerFactory.getLogger(RequestInfoService.class);
+
+    public List<User> getUsers(String login) {
+        return getUserData(login);
     }
 
+
+    private final RestTemplate restTemplate = new RestTemplate();
+
     private List<User> getUserData(String login) {
-        return WebClient.create().get()
-                .uri(URL + USERS + "/" + login)
-                .accept(MediaType.APPLICATION_JSON)
-                .retrieve()
-                .onStatus(HttpStatusCode::is4xxClientError, this::handleErrors)
-                .bodyToFlux(User.class)
-                .collectList()
-                .block();
+        try {
+            return List.of(Objects.requireNonNull(restTemplate.getForEntity(URL + USERS + "/" + login, User.class)
+                    .getBody()));
+        } catch (Exception e) {
+            if (e instanceof HttpServerErrorException serverEx) {
+                logger.error("User with login {} not found cause of {}", login, serverEx.getMessage());
+            } else if (e instanceof HttpClientErrorException clientEx) {
+                logger.error("User with login {} not found cause of {}", login, clientEx.getMessage());
+            } else {
+                logger.error("User with login {} not found cause of {}", login, e.getMessage());
+            }
+            return null;
+        }
     }
 
     private Mono<Throwable> handleErrors(ClientResponse response) {
         return response.bodyToMono(String.class).flatMap(body -> Mono.error(UserNotFoundException::new));
     }
 
-    private static Stream<User> mapDataToUser(Object[] gitUser, ObjectMapper mapper) {
-        return Arrays.stream(Objects.requireNonNull(gitUser))
-                .map(o -> mapper.convertValue(o, User.class));
-    }
 }
