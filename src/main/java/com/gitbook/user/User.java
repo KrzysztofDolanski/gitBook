@@ -1,14 +1,11 @@
 package com.gitbook.user;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import java.time.LocalDateTime;
 
-public class User {
+@JsonIgnoreProperties(ignoreUnknown = true)
+public record User(Long id, String login, String name, String type, String avatarUrl, LocalDateTime createdAt,
+                   Long calculations) {
 
-    private Long id;
-    private String login;
-    private String name;
-    private String type;
-    private String avatarUrl;
-    private LocalDateTime createdAt;
-    private Long calculations;
 }

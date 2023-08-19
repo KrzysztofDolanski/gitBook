@@ -10,6 +10,6 @@ public class UserController {
 
     @GetMapping("/users/{login}")
     public ResponseEntity<User> getUserByLogin(@PathVariable("login") String login) {
-
+        return null;
     }
 }
