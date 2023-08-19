@@ -6,7 +6,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 /**
  * @author Krzysztof Dolański
@@ -37,7 +36,6 @@ public class RequestInfoService {
     public List<RequestInfo> findOneByREQUEST_COUNTDesc() {
         return repository.findOneByRequestCountDesc();
     }
-
 
     private RequestInfo userRequestInfoMapper(String login, Long count) {
         return new RequestInfo.RequestInfoBuilder().login(login).requestCount(count).build();

@@ -1,7 +1,5 @@
 package com.gitbook.user;
 
-import lombok.Builder;
-
 import java.time.LocalDateTime;
 
 /**
