@@ -16,6 +16,10 @@ Schema name for tests
 -----------
 - gitbooktests
 
+Run by Maven
+-----------
+mvn spring-boot:run
+
 Endpoints
 --------
 
