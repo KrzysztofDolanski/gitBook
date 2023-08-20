@@ -8,6 +8,14 @@ Requirements:
 - maven
 - MySQL
 
+Schema name
+-------
+- gitbook
+
+Schema name for tests
+-----------
+- gitbooktests
+
 Endpoints
 --------
 
